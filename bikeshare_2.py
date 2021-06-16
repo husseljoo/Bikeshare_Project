@@ -115,6 +115,7 @@ def load_data(city, month, day):
         df['Month'] = df['Start Time'].dt.month
         df=df[df['Month']==month_number]
     if day!="all":
+        df['Weekday'] = df['Start Time'].dt.day_name()
         df=df[df['Weekday']==day]
 
 
