@@ -5,17 +5,12 @@ import datetime
 from datetime import date
 import calendar
 
-# CITY, MONTH, DAY="","",""
 
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
+              'new york': 'new_york_city.csv',
               'washington': 'washington.csv' }
-
-monthList = ['all','january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
 dayList = ['all','Sunday','Monday',' Tuesday','Wednesday','Thursday','Friday']
-cityList = ['chicago','washington','new york','new york city']
-decisionList=['day','month','none','both']
-
 month_dict={'january': 1,
  'february': 2,
  'march': 3,
@@ -32,7 +27,6 @@ month_dict={'january': 1,
 def get_filters():
     """
     Asks user to specify a city, month, and day to analyze.
-
     Returns:
         (str) city - name of the city to analyze
         (str) month - name of the month to filter by, or "all" to apply no month filter
@@ -46,29 +40,19 @@ def get_filters():
     while(True):
        try:
            city=input("").lower()
-           if(correctCity(city)):
+           if(city in CITY_DATA):
                break
            print("Enter a correct city:")
        except:
            print("Enter a correct city:")
 
-    # print("Would you like to filter the data by month, day,both or none:")
-    # while(True):
-    #     try:
-    #         decision=input("").lower()
-    #         if(correctDecision(decision)):
-    #             break
-    #         print("Enter a correct decision:")
-    #     except:
-    #         print("Enter a correct decision:")
 
-    # get user input for month (all, january, february, ... , june)
     print("Enter a particular month or all if you wish to inspect all months: ")
     month=""
     while(True):
         try:
             month=input("").lower()
-            if(correctMonth(month)):
+            if((month in month_dict) or month=="all"):
                 break
             print("Enter a correct month:")
         except:
@@ -91,11 +75,9 @@ def get_filters():
 
     return city, month, day
 
-
 def load_data(city, month, day):
     """
     Loads data for the specified city and filters by month and day if applicable.
-
     Args:
         (str) city - name of the city to analyze
         (str) month - name of the month to filter by, or "all" to apply no month filter
@@ -103,14 +85,7 @@ def load_data(city, month, day):
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
-
-    print("City: {} Month: {} Day: {} ".format(city,month,day))
-    if city=="chicago":
-        df=pd.read_csv("chicago.csv")
-    elif city=="washington":
-        df=pd.read_csv("washington.csv")
-    else:
-        df=pd.read_csv("new_york_city.csv")
+    df=pd.read_csv(CITY_DATA[city])
 
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['Weekday'] = df['Start Time'].dt.day_name()
@@ -131,8 +106,6 @@ def time_stats(df,month,day):
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
 
-    print("month is {}".format(month))
-    print(df.columns)
     # display the most common month
 
     if month=='all':
@@ -178,7 +151,7 @@ def station_stats(df):
     # display most frequent combination of start station and end station trip
 
     max_comb=df.groupby(['Start Station','End Station']).size().idxmax()
-    print("The most common start/end station combination is {}".format(max_comb))
+    print("The most common start/end station combination is {} and {}".format(max_comb[0],max_comb[1]))
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -202,71 +175,70 @@ def trip_duration_stats(df):
     print('-'*40)
 
 
-def user_stats(df):
+def user_stats(df,city):
     """Displays statistics on bikeshare users."""
 
     print('\nCalculating User Stats...\n')
     start_time = time.time()
 
     # Display counts of user types
-    print(df.groupby(['User Type']).size())
+
+    print("User Type Counts is :")
+    user_series=df.groupby(['User Type']).size()
+    user_index=list(user_series.index)
+    user_values=list(user_series.tolist())
+    user_display=list(zip(user_index,user_values))
+
+    for a,b in user_display:
+        print("{}: {}".format(a,b))
 
     # Display counts of gender
-    print(df.groupby(['Gender']).size())
+    if (city!="washington"):
+        print("\nGender Counts is :")
+        gender_series=df.groupby(['Gender']).size()
+        gender_index=list(gender_series.index)
+        gender_values=list(gender_series.tolist())
+        gender_display=list(zip(gender_index,gender_values))
+        for a,b in gender_display:
+            print("{}: {}".format(a,b))
 
     # Display earliest, most recent, and most common year of birth
-    early_year=df['Birth Year'].min()
-    print("The earliest birth year is {}".format(early_year))
+        print()
+        early_year=df['Birth Year'].min()
+        print("The earliest birth year is {}\n".format(int(early_year)))
 
-    latest_year=df['Birth Year'].max()
-    print("The latest birth year is {}".format(latest_year))
+        latest_year=df['Birth Year'].max()
+        print("The latest birth year is {}\n".format(int(latest_year)))
 
-    common_year=df['Birth Year'].value_counts().idxmax()
-    print("The most birth year is {}".format(common_year))
+        common_year=df['Birth Year'].value_counts().idxmax()
+        print("The most birth year is {}\n".format(int(common_year)))
 
 
-    print("\nThis took %s seconds." % (time.time() - start_time))
-    print('-'*40)
+        print("\nThis took %s seconds." % (time.time() - start_time))
+        print('-'*40)
 
-def correctCity(city):
-    if city in cityList:
-        return True
-    return False
 
 def correctDay(day):
     if day in dayList:
         return True
     return False
 
-def correctDecision(decision):
-    if decision in decisionList:
-        return True
-    return False
-
-def correctMonth(month):
-    if month in monthList:
-        return True
-    return False
-
 def main():
     while True:
-        # city, month, day = get_filters()
-        # print("City: {} Month: {} Day: {} ".format(city,month,day))
-        city="chicago"
-        month="all"
-        day="all"
+        city, month, day = get_filters()
+        print("City: {} Month: {} Day: {} ".format(city,month.capitalize(),day))
         df = load_data(city, month, day)
-        print("Here are the columns of the returned df:")
-        print(df.columns)
-        print(df.head)
-        time_stats(df,month,day)
-        station_stats(df)
-        trip_duration_stats(df)
-        user_stats(df)
+        if df.empty:
+            print("There is no data that satisifies the criteria you chose!")
+        else:
+            time_stats(df,month,day)
+            station_stats(df)
+            trip_duration_stats(df)
+            user_stats(df,city)
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
 
-
 if __name__ == "__main__":
-	main()
+    main()
+
