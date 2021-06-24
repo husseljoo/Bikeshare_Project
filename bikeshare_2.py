@@ -229,13 +229,29 @@ def main():
         print("City: {} Month: {} Day: {} ".format(city,month.capitalize(),day))
         df = load_data(city, month, day)
         if df.empty:
-            print("There is no data that satisifies the criteria you chose!")
+            print("\nThere is no data that satisifies the criteria you chose!")
         else:
+            show_more=input("\nWould you like to see the most frequent times of travel? (yes or no) default=yes\n")
+            if show_more.lower() == 'no':
+                break
             time_stats(df,month,day)
+
+            show_more=input("\nWould you like to see the most popular stations and trips? (yes or no) default=yes\n")
+            if show_more.lower() == 'no':
+                break
             station_stats(df)
+
+            show_more=input("\nWould you like to see the calculation of the trip duration? (yes or no) default=yes\n")
+            if show_more.lower() == 'no':
+                break
             trip_duration_stats(df)
+
+            show_more=input("\nWould you like to see the calculation of the user stats? (yes or no) default=yes\n")
+            if show_more.lower() == 'no':
+                break
             user_stats(df,city)
-        restart = input('\nWould you like to restart? Enter yes or no.\n')
+
+        restart = input('\nWould you like to restart? Enter (yes or no) default=no\n')
         if restart.lower() != 'yes':
             break
 
