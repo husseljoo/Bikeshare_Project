@@ -223,6 +223,14 @@ def correctDay(day):
         return True
     return False
 
+def display_data(df):
+    index=0
+    user_input=input('would you like to display 5 rows of raw data? default=no ').lower()
+    while user_input in ['yes','y','yep','yea'] and index+5 < df.shape[0]:
+        print(df.iloc[index:index+5])
+        index += 5
+        user_input = input('would you like to display more 5 rows of raw data? default=no').lower()
+
 def main():
     while True:
         city, month, day = get_filters()
@@ -232,24 +240,22 @@ def main():
             print("\nThere is no data that satisifies the criteria you chose!")
         else:
             show_more=input("\nWould you like to see the most frequent times of travel? (yes or no) default=yes\n")
-            if show_more.lower() == 'no':
-                break
-            time_stats(df,month,day)
+            if show_more.lower() != 'no':
+                time_stats(df,month,day)
 
             show_more=input("\nWould you like to see the most popular stations and trips? (yes or no) default=yes\n")
-            if show_more.lower() == 'no':
-                break
-            station_stats(df)
+            if show_more.lower() != 'no':
+                station_stats(df)
 
             show_more=input("\nWould you like to see the calculation of the trip duration? (yes or no) default=yes\n")
-            if show_more.lower() == 'no':
-                break
-            trip_duration_stats(df)
+            if show_more.lower() != 'no':
+                trip_duration_stats(df)
 
             show_more=input("\nWould you like to see the calculation of the user stats? (yes or no) default=yes\n")
-            if show_more.lower() == 'no':
-                break
-            user_stats(df,city)
+            if show_more.lower() != 'no':
+                user_stats(df,city)
+
+            display_data(df)
 
         restart = input('\nWould you like to restart? Enter (yes or no) default=no\n')
         if restart.lower() != 'yes':
